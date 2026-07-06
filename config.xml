@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.xiaomi.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>小密</name>
+    <description>智能信用管家</description>
+    <author email="xixsl@163.com" href="https://xiaomi.app">XiaoMi Team</author>
+    <content src="index.html" />
+    <preference name="EnableLocalStorage" value="true" />
+    <platform name="android">
+        <icon src="icon.png" />
+    </platform>
+</widget>

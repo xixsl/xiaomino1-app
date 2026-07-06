@@ -1,0 +1,577 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小密 - 智能信用管家 (双主题版)</title>
+    <style>
+        /* === 主题变量定义 === */
+        :root {
+            /* 默认：成熟稳重主题 */
+            --primary: #1E88E5;
+            --primary-dark: #1565C0;
+            --bg-body: #F5F5F5;
+            --bg-card: #FFFFFF;
+            --text-main: #263238;
+            --text-sub: #78909C;
+            --accent: #FF9800;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --border-radius: 12px;
+            --btn-radius: 8px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --header-grad: linear-gradient(135deg, #1E88E5, #42A5F5);
+            --btn-grad: linear-gradient(135deg, #9C27B0, #673AB7);
+            --line-height: 1.5;
+            --font-family: 'Microsoft YaHei', sans-serif;
+            --card-padding: 16px;
+        }
+
+        /* 青春活力主题覆盖 */
+        body.theme-youth {
+            --primary: #9C27B0;
+            --primary-dark: #7B1FA2;
+            --bg-body: #E3F2FD; /* 浅蓝底 */
+            --bg-card: #FFFFFF;
+            --text-main: #311B92;
+            --text-sub: #5C6BC0;
+            --accent: #FF4081;
+            --success: #00E676;
+            --danger: #FF1744;
+            --border-radius: 20px; /* 更大圆角 */
+            --btn-radius: 25px; /* 胶囊按钮 */
+            --shadow: 0 6px 16px rgba(156, 39, 176, 0.2); /* 紫色阴影 */
+            --header-grad: linear-gradient(135deg, #9C27B0, #FF4081); /* 紫粉渐变 */
+            --btn-grad: linear-gradient(135deg, #FF4081, #E040FB);
+            --line-height: 1.6;
+            --font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            --card-padding: 20px;
+        }
+
+        /* === 基础样式 === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
+        body { background-color: var(--bg-body); color: var(--text-main); padding-bottom: 70px; transition: all 0.3s ease; }
+        
+        /* 头部 */
+        .header { 
+            background: var(--header-grad); 
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            border-radius: 0 0 20px 20px;
+            transition: all 0.3s ease;
+        }
+        .header h1 { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .header p { font-size: 12px; opacity: 0.9; }
+
+        /* 图标与布局 */
+        .container { max-width: 600px; margin: 0 auto; padding: 0 15px 15px; }
+        .card { 
+            background: var(--bg-card); 
+            border-radius: var(--border-radius); 
+            padding: var(--card-padding); 
+            margin-bottom: 15px; 
+            box-shadow: var(--shadow); 
+            position: relative; overflow: hidden; 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        body.theme-youth .card { border: 2px solid #F3E5F5; }
+        .card:active { transform: scale(0.98); }
+        
+        .card::before { 
+            content: ""; position: absolute; top: 0; left: 0; width: 5px; height: 100%; 
+            background: var(--primary); transition: background 0.3s; 
+        }
+
+        .bank-icon { width: 40px; height: 40px; background: #F5F5F5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 12px; border: 2px solid #E0E0E0; }
+        body.theme-youth .bank-icon { background: #E1BEE7; border-color: var(--primary); color: white; }
+
+        .card-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .card-name { flex: 1; font-weight: bold; font-size: 17px; color: var(--text-main); }
+        .card-bank { color: var(--text-sub); font-size: 13px; margin-left: 8px; }
+
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; }
+        .stat-label { color: var(--text-sub); }
+        .stat-value { font-weight: bold; font-size: 15px; color: var(--text-main); }
+        .stat-value.limit { color: var(--primary); }
+        .stat-value.used { color: var(--accent); }
+        .stat-value.available { color: var(--success); }
+
+        .progress-bar { height: 12px; background: #E0E0E0; border-radius: 10px; overflow: hidden; margin: 10px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .progress-fill { height: 100%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
+
+        /* 按钮通用 */
+        .btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 10px 0; 
+            border-radius: var(--btn-radius); 
+            font-size: 14px; 
+            width: 100%; 
+            cursor: pointer; 
+            margin-top: 12px; 
+            font-weight: bold; 
+            transition: all 0.2s; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn:active { transform: scale(0.96); background: var(--primary-dark); }
+        .btn-outline { 
+            background: transparent; 
+            border: 2px solid var(--primary); 
+            color: var(--primary); 
+            box-shadow: none; 
+        }
+        .btn-outline:active { background: rgba(30, 136, 229, 0.08); transform: scale(0.96); }
+        
+        body.theme-youth .btn { background: var(--btn-grad); color: white; }
+        body.theme-youth .btn:active { background: linear-gradient(135deg, #C51162, #AA00FF); }
+        body.theme-youth .btn-outline { border: 2px solid var(--primary); color: var(--primary); }
+
+        .btn-sms { background: var(--success); }
+        .btn-ai { background: linear-gradient(135deg, #FFC107, #FF9800); color: #3E2723; }
+        .btn-apply { background: var(--btn-grad); }
+
+        /* 底部导航 */
+        .nav { 
+            display: flex; justify-content: space-around; padding: 10px 0; 
+            background: white; border-top: 1px solid rgba(0,0,0,0.05); 
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 99; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+            max-width: 600px; margin: 0 auto; 
+            border-radius: 20px 20px 0 0;
+            transition: all 0.3s;
+        }
+        body.theme-youth .nav { background: #F3E5F5; border-top: 1px solid #E1BEE7; }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 11px; cursor: pointer; flex: 1; transition: color 0.3s; }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item.active .nav-icon { transform: scale(1.2); }
+
+        /* 状态徽章 */
+        .status-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+        .status-badge.good { background: rgba(76, 175, 80, 0.15); color: var(--success); }
+        .status-badge.warn { background: rgba(255, 152, 0, 0.15); color: var(--accent); }
+        .status-badge.danger { background: rgba(244, 67, 54, 0.15); color: var(--danger); }
+
+        /* 申请横幅 */
+        .apply-banner { 
+            background: linear-gradient(135deg, #F3E5F5, #E1BEE7); 
+            border: 1px solid var(--primary); 
+            padding: 10px; 
+            border-radius: 12px; 
+            margin-top: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        body.theme-youth .apply-banner { background: linear-gradient(135deg, #FCE4EC, #F8BBD0); border-color: #EC407A; }
+        .apply-text { font-size: 13px; font-weight: bold; color: var(--text-main); }
+        .apply-link { 
+            color: var(--primary); text-decoration: none; font-size: 12px; 
+            background: white; padding: 4px 10px; border-radius: 12px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold; 
+        }
+
+        /* 输入框与表单 */
+        input, select { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: var(--btn-radius); font-size: 14px; margin-bottom: 10px; background: white; 
+            transition: border 0.3s;
+        }
+        input:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1); }
+        body.theme-youth input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2); }
+
+        /* 弹窗 */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; width: 100%; max-width: 600px; max-height: 90vh; border-radius: 20px 20px 0 0; overflow: hidden; display: flex; flex-direction: column; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { padding: 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+        body.theme-youth .modal-header { background: var(--header-grad); }
+        .modal-title { font-size: 18px; font-weight: bold; }
+        .modal-close { font-size: 28px; line-height: 1; cursor: pointer; opacity: 0.8; }
+        .modal-content { padding: 20px; overflow-y: auto; flex: 1; background: var(--bg-body); }
+
+        /* AI 识别卡片 */
+        .ai-card { 
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2); 
+            border: 2px solid var(--accent); 
+            padding: 20px; 
+            border-radius: var(--border-radius); 
+            text-align: center; 
+            margin-bottom: 15px; 
+        }
+        body.theme-youth .ai-card { background: linear-gradient(135deg, #FCE4EC, #F8BBD0); border-color: #EC407A; }
+        .ai-input { border: 2px solid var(--accent); }
+        body.theme-youth .ai-input { border-color: #EC407A; }
+
+        /* 申请框 */
+        .apply-box { 
+            background: linear-gradient(135deg, #FFF9C4, #FFECB3); 
+            border: 2px dashed var(--accent); 
+            padding: 15px; 
+            border-radius: var(--border-radius); 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        body.theme-youth .apply-box { background: linear-gradient(135deg, #F3E5F5, #E1BEE7); border-color: var(--primary); }
+        .apply-box-btn { 
+            background: var(--btn-grad); color: white; font-weight: bold; padding: 10px 20px; 
+            border-radius: 25px; text-decoration: none; display: inline-block; font-size: 14px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.2s; 
+        }
+        .apply-box-btn:active { transform: scale(0.95); }
+
+        /* 开关按钮 */
+        .theme-switch-btn {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            font-size: 20px; padding: 5px 10px; border-radius: 20px; cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔹 小密</h1>
+        <p id="header-sub">智能信用管家</p>
+        <button class="theme-switch-btn" onclick="toggleTheme()" title="切换主题">🎨</button>
+    </div>
+
+    <div class="container" id="app">
+        <!-- 动态内容 -->
+    </div>
+
+    <!-- AI 识别弹窗 -->
+    <div class="modal-overlay" id="aiModal">
+        <div class="modal">
+            <div class="modal-header" id="aiModalHeader">
+                <div class="modal-title">🤖 智能识别更新</div>
+                <div class="modal-close" onclick="closeAiModal()">×</div>
+            </div>
+            <div class="modal-content">
+                <div class="ai-card">
+                    <span class="ai-icon">📋</span>
+                    <div class="ai-title">粘贴银行短信，自动更新额度</div>
+                    <div class="ai-desc">1. 复制回复短信  2. 粘贴  3. 自动识别</div>
+                    <input type="text" id="smsInput" class="ai-input" placeholder="在此粘贴短信内容...">
+                    <button class="btn" onclick="processSmsText()">🚀 智能识别并更新</button>
+                    <div class="ai-tips">💡 支持：可用额度、账单金额、剩余额度</div>
+                </div>
+                <div id="aiPreview" style="display:none; background:#FFF; padding:15px; border-radius:12px; margin-top:10px; border:1px solid var(--accent);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>识别结果：</span>
+                        <span id="aiResultVal" style="font-weight:bold; color:var(--accent); font-size:16px;"></span>
+                    </div>
+                    <button class="btn" style="background:var(--success); margin-top:10px;" onclick="confirmAiUpdate()">✅ 确认更新</button>
+                    <button class="btn btn-outline" style="margin-top:8px;" onclick="document.getElementById('aiPreview').style.display='none'">✖ 重新输入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="showPage('cards')">
+            <span class="nav-icon">💳</span>
+            <span>我的卡片</span>
+        </div>
+        <div class="nav-item" onclick="showPage('strategy')">
+            <span class="nav-icon">📊</span>
+            <span>信用策略</span>
+        </div>
+        <div class="nav-item" onclick="showPage('sms')">
+            <span class="nav-icon">📨</span>
+            <span>一键查询</span>
+        </div>
+        <div class="nav-item" onclick="showPage('add')">
+            <span class="nav-icon">➕</span>
+            <span>添加</span>
+        </div>
+    </div>
+
+    <script>
+        let cards = JSON.parse(localStorage.getItem('xiaomi_cards')) || [];
+        let currentTheme = localStorage.getItem('xiaomi_theme') || 'adult';
+        
+        // 初始化主题
+        function initTheme() {
+            if (currentTheme === 'youth') {
+                document.body.classList.add('theme-youth');
+                document.getElementById('header-sub').innerText = '活力信用管家';
+            } else {
+                document.body.classList.remove('theme-youth');
+                document.getElementById('header-sub').innerText = '智能信用管家';
+            }
+        }
+        initTheme();
+
+        const bankApplyLinks = {
+            "工商银行": "https://www.icbc.com.cn/creditcard/",
+            "建设银行": "https://www.ccb.com/creditcard/",
+            "招商银行": "https://creditcard.cmbc.com.cn/",
+            "农业银行": "https://www.abchina.com/creditcard/",
+            "中国银行": "https://www.boc.cn/creditcard/",
+            "交通银行": "https://www.bankcomm.com/creditcard/",
+            "中信银行": "https://www.citicbank.com/creditcard/",
+            "浦发银行": "https://www.spdb.com.cn/creditcard/",
+            "光大银行": "https://www.cebbank.com/creditcard/",
+            "民生银行": "https://www.cmbc.com.cn/creditcard/",
+            "兴业银行": "https://www.cib.com.cn/creditcard/",
+            "广发银行": "https://www.cgbchina.com.cn/creditcard/"
+        };
+
+        const bankSmsCodes = {
+            "工商银行": { number: "95588", code: "CXYE#卡号后4位", desc: "查询余额" },
+            "建设银行": { number: "95533", code: "CXLL#卡号后4位", desc: "查询额度" },
+            "招商银行": { number: "95555", code: "CXDK#卡号后4位", desc: "查询额度" },
+            "农业银行": { number: "95599", code: "CXYE", desc: "查询余额" },
+            "中国银行": { number: "95566", code: "CXYE#卡号后4位", desc: "查询余额" },
+            "交通银行": { number: "95559", code: "CXYE", desc: "查询余额" },
+            "中信银行": { number: "95558", code: "CXYE", desc: "查询余额" },
+            "浦发银行": { number: "95528", code: "CXYE", desc: "查询余额" },
+            "光大银行": { number: "95595", code: "CXYE", desc: "查询余额" },
+            "民生银行": { number: "95568", code: "CXYE", desc: "查询余额" },
+            "兴业银行": { number: "95561", code: "CXYE", desc: "查询余额" },
+            "广发银行": { number: "95508", code: "CXYE", desc: "查询余额" }
+        };
+
+        let currentUpdateCardId = null;
+        let extractedValue = 0;
+
+        function saveCards() {
+            localStorage.setItem('xiaomi_cards', JSON.stringify(cards));
+            renderApp();
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'adult' ? 'youth' : 'adult';
+            localStorage.setItem('xiaomi_theme', currentTheme);
+            initTheme();
+            renderApp(); // 重新渲染以更新动态文本
+        }
+
+        function openSmsApp(bankName) {
+            const bank = bankSmsCodes[bankName];
+            if (!bank) { alert("暂未收录该银行代码"); return; }
+            const smsLink = `sms:${bank.number}?body=${encodeURIComponent(bank.code)}`;
+            window.location.href = smsLink;
+            setTimeout(() => alert(`✅ 已跳转短信App！\n接收人：${bank.number}\n内容：${bank.code}\n请手动点击【发送】`), 500);
+        }
+
+        function openApplyLink(bankName) {
+            const link = bankApplyLinks[bankName];
+            if (link) {
+                const slogan = currentTheme === 'youth' ? "✨ 快来薅羊毛！新用户奖励多多！" : "✅ 正在为您打开【" + bankName + "】官方申请页...";
+                alert(slogan);
+                window.open(link, '_blank');
+            } else {
+                alert("该银行申请链接暂维护中。");
+            }
+        }
+
+        function processSmsText() {
+            const text = document.getElementById('smsInput').value;
+            if (!text.trim()) { alert("请先粘贴"); return; }
+            let match = text.match(/可用额度[：:\s]*([\d,]+)\s*元/);
+            let val = match ? parseFloat(match[1].replace(/,/g, '')) : 0;
+            if (val === 0) {
+                match = text.match(/账单金额[：:\s]*([\d,]+)\s*元/);
+                let bill = match ? parseFloat(match[1].replace(/,/g, '')) : 0;
+                if (bill > 0 && currentUpdateCardId) {
+                    const card = cards.find(c => c.id === currentUpdateCardId);
+                    if (card) { val = card.limit - bill; alert(`检测到“账单金额 ${bill}”，已算可用：${val}`); }
+                }
+            }
+            if (val === 0) {
+                match = text.match(/剩余[额度]?[：:\s]*([\d,]+)\s*元/);
+                val = match ? parseFloat(match[1].replace(/,/g, '')) : 0;
+            }
+            if (val > 0) {
+                extractedValue = val;
+                document.getElementById('aiResultVal').innerText = `可用额度：${val} 元`;
+                document.getElementById('aiPreview').style.display = 'block';
+            } else {
+                alert("❌ 未识别到数字，请检查短信内容。");
+                document.getElementById('aiPreview').style.display = 'none';
+            }
+        }
+
+        function confirmAiUpdate() {
+            if (!currentUpdateCardId) return;
+            const card = cards.find(c => c.id === currentUpdateCardId);
+            if (card) {
+                const used = card.limit - extractedValue;
+                card.usedLimit = Math.max(0, used);
+                saveCards();
+                const msg = currentTheme === 'youth' ? "✅ 搞定！已用额度更新为：" + used : "✅ 数据已更新！已用额度：" + used;
+                alert(msg);
+                closeAiModal();
+                showPage('cards');
+            }
+        }
+
+        function renderDashboard() {
+            const totalLimit = cards.reduce((sum, c) => sum + c.limit, 0);
+            const totalUsed = cards.reduce((sum, c) => sum + c.usedLimit, 0);
+            const totalAvailable = totalLimit - totalUsed;
+            return `
+                <div class="overview-dashboard">
+                    <div class="overview-title"><span>📊 额度大盘</span><span style="font-size:12px; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:10px;">${cards.length} 张卡</span></div>
+                    <div class="overview-grid">
+                        <div class="overview-item"><div class="overview-value blue">${totalLimit}</div><div class="overview-label">总授信</div></div>
+                        <div class="overview-item"><div class="overview-value red">${totalUsed}</div><div class="overview-label">已用</div></div>
+                        <div class="overview-item"><div class="overview-value green">${totalAvailable}</div><div class="overview-label">可用</div></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCards() {
+            // 动态文案：根据主题切换
+            const applyLowText = currentTheme === 'youth' ? "⚠️ 额度告急😭" : "⚠️ 额度紧张？";
+            const applyLowBtn = currentTheme === 'youth' ? "🆕 赶紧办新卡" : "🆕 申请同银行新卡";
+            const applyHighText = currentTheme === 'youth' ? "💡 额度满满🎉" : "💡 额度充足，推荐办卡";
+            const applyHighBtn = currentTheme === 'youth' ? "🆕 再薅几张" : "🆕 申请同银行新卡";
+            
+            const dashboard = renderDashboard();
+            if (cards.length === 0) {
+                return `${dashboard}<div class="empt-state"><span>💳</span><h3>${currentTheme==='youth'?'空空如也呢~':'暂无信用卡'}</h3><p>${currentTheme==='youth'?'快去加点卡片吧':'点击下方“添加”或“一键申请”'}</p><button class="btn" style="margin-top:20px; background:var(--success);" onclick="showPage('sms')">${currentTheme==='youth'?'去搞点钱':'去一键查询/申请'}</button></div>`;
+            }
+            let cardList = cards.map(card => {
+                const usageRate = card.usedLimit / card.limit;
+                const available = card.limit - card.usedLimit;
+                const isLow = available < card.limit * 0.3;
+                
+                let applyInfo = '';
+                if (isLow) {
+                    applyInfo = `<div class="apply-banner"><div class="apply-text">${applyLowText}</div><a href="#" onclick="openApplyLink('${card.bank}'); return false;" class="apply-link">${applyLowBtn}</a></div>`;
+                } else {
+                     applyInfo = `<div class="apply-banner" style="background:linear-gradient(135deg, #E8F5E9, #C8E6C9); border-color:#A5D6A7;"><div class="apply-text" style="color:var(--success);">${applyHighText}</div><a href="#" onclick="openApplyLink('${card.bank}'); return false;" class="apply-link" style="background:#C8E6C9; color:var(--success);">${applyHighBtn}</a></div>`;
+                }
+
+                return `
+                    <div class="card">
+                        <div class="card-header"><div class="bank-icon">🏦</div><div class="card-name">${card.name} <span class="card-bank">${card.bank}</span></div></div>
+                        <div class="stat-row"><span class="stat-label">总授信</span><span class="stat-value limit">${card.limit}</span></div>
+                        <div class="stat-row"><span class="stat-label">估算可用</span><span class="stat-value available" style="font-weight:bold;">${available}</span></div>
+                        <div class="progress-bar"><div class="progress-fill" style="width:${usageRate * 100}%; background:${usageRate < 0.5 ? 'var(--success)' : (usageRate < 0.8 ? 'var(--accent)' : 'var(--danger)')}"></div></div>
+                        ${applyInfo}
+                        <div style="display:flex; gap:8px; margin-top:12px;">
+                            <button class="btn btn-outline" onclick="editCard(${card.id})" style="font-size:12px; flex:1;">${currentTheme==='youth'?'还钱':'还款'}</button>
+                            <button class="btn btn-sms" onclick="openSmsApp('${card.bank}')" style="font-size:12px; flex:1;">📨 查余额</button>
+                            <button class="btn btn-ai" onclick="openAiModal(${card.id})" style="font-size:12px; flex:1;">🤖 AI更新</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            return dashboard + cardList;
+        }
+
+        function renderSmsQuery() {
+            let smsList = Object.keys(bankSmsCodes).map(bankName => {
+                const bank = bankSmsCodes[bankName];
+                const btnText = currentTheme === 'youth' ? "🆕 搞钱" : "🆕 申请";
+                return `
+                    <div class="sms-item">
+                        <div class="sms-header">
+                            <span class="sms-bank">🏦 ${bankName}</span>
+                            <div style="display:flex; gap:6px;">
+                                <button class="sms-btn" onclick="openSmsApp('${bankName}')" style="background:var(--success);">一键发送</button>
+                                <button class="sms-btn btn-apply" onclick="openApplyLink('${bankName}')">${btnText}</button>
+                            </div>
+                        </div>
+                        <div class="sms-detail">
+                            <strong>发送至：</strong> <span style="color:var(--primary);">${bank.number}</span><br>
+                            <strong>代码：</strong> <small>${bank.code}</small><br>
+                            <small style="color:var(--text-sub);">点击“${btnText}"直达官方页</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            const title = currentTheme === 'youth' ? "📱 查余额 & 搞钱神器" : "📱 银行短信 & 极速申请";
+            const desc = currentTheme === 'youth' ? "查完没额度？直接点“搞钱”！" : "查询余额后，若额度紧张，直接点击“申请”办新卡！";
+            return `
+                <div class="card" style="background:rgba(76, 175, 80, 0.1); border-left:4px solid var(--success);">
+                    <h3 style="color:var(--success); margin-bottom:10px;">${title}</h3>
+                    <p style="font-size:12px; color:var(--text-sub); margin-bottom:15px;">${desc}</p>
+                    <div class="sms-panel" style="background:transparent; border:none; padding:0;">${smsList}</div>
+                </div>
+            `;
+        }
+
+        function renderStrategy() { return `<div class="card"><h3>📊 信用策略</h3><p>${currentTheme==='youth'?'开发中，敬请期待~':'开发中，敬请期待'}</p></div>`; }
+
+        function renderAdd() {
+            const bankOptions = Object.keys(bankSmsCodes).map(b => `<option>${b}</option>`).join('');
+            const boxTitle = currentTheme === 'youth' ? "🏦 还没卡？快搞一张！" : "🏦 还没有信用卡？";
+            const boxDesc = currentTheme === 'youth' ? "点击下面按钮，立马拿下高额卡！" : "点击下方按钮，立即申请主流银行高额度信用卡！";
+            const btnText = currentTheme === 'youth' ? "🆕 赶紧搞一张 (招商银行)" : "🆕 立即申请信用卡 (招商银行)";
+            const subText = currentTheme === 'youth' ? "或选下面银行 → 点“搞钱”" : "或选择下方银行 → 点击“申请”";
+
+            return `
+                <div class="card">
+                    <h3>➕ ${currentTheme==='youth'?'新增卡片':'添加新卡片'}</h3>
+                    
+                    <div class="apply-box">
+                        <div class="apply-box-title">${boxTitle}</div>
+                        <div class="apply-box-desc">${boxDesc}</div>
+                        <a href="#" onclick="openApplyLink('招商银行'); return false;" class="apply-box-btn">${btnText}</a>
+                        <div style="margin-top:8px; font-size:11px; color:var(--text-sub);">${subText}</div>
+                    </div>
+
+                    <label style="display:block; margin-bottom:8px; font-weight:bold; color:var(--text-main);">选择银行</label>
+                    <select id="bankName" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:var(--btn-radius); font-size:14px; margin-bottom:15px; background:white;">
+                        ${bankOptions}
+                    </select>
+                    <input type="text" id="cardName" placeholder="卡片名称 (例：招商银行Young卡)" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:var(--btn-radius); font-size:14px; margin-bottom:10px;">
+                    <input type="number" id="cardLimit" placeholder="信用额度 (元)" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:var(--btn-radius); font-size:14px; margin-bottom:10px;">
+                    <label style="display:block; margin:10px 0 5px; font-weight:bold; color:var(--text-main);">选择账单日</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="number" id="billDay" placeholder="1-31" value="5" style="width:60px; padding:12px; border:1px solid #ddd; border-radius:var(--btn-radius); font-size:14px;">
+                        <div style="flex:1; font-size:12px; color:var(--text-sub); display:flex; align-items:center;">(账单日，自动算最佳刷卡日)</div>
+                    </div>
+                    <button class="btn" onclick="addCard()" style="margin-top:20px;">✅ ${currentTheme==='youth'?'搞定':'添加卡片'}</button>
+                </div>
+            `;
+        }
+
+        function addCard() {
+            const bank = document.getElementById('bankName').value;
+            const name = document.getElementById('cardName').value;
+            const limit = parseFloat(document.getElementById('cardLimit').value);
+            const billDay = parseInt(document.getElementById('billDay').value);
+            if (!name || !limit || !billDay) { alert('请填写完整'); return; }
+            cards.push({ id: Date.now(), name, bank, limit, billDay, usedLimit: 0 });
+            saveCards();
+            alert(currentTheme==='youth'?'✅ 搞定！':'✅ 添加成功！');
+            showPage('cards');
+        }
+
+        function openAiModal(id) {
+            currentUpdateCardId = id; borrowedValue = 0;
+            document.getElementById('smsInput').value = '';
+            document.getElementById('aiPreview').style.display = 'none';
+            document.getElementById('aiModal').classList.add('active');
+        }
+        function closeAiModal() { document.getElementById('aiModal').classList.remove('active'); currentUpdateCardId = null; }
+
+        function showPage(page) {
+            const app = document.getElementById('app');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const indices = { 'cards': 0, 'strategy': 1, 'sms': 2, 'add': 3 };
+            document.querySelectorAll('.nav-item')[indices[page]].classList.add('active');
+            if (page === 'cards') app.innerHTML = renderCards();
+            else if (page === 'strategy') app.innerHTML = renderStrategy();
+            else if (page === 'sms') app.innerHTML = renderSmsQuery();
+            else if (page === 'add') app.innerHTML = renderAdd();
+        }
+
+        function closeModal() { document.getElementById('cardModal').classList.remove('active'); }
+        window.onload = function() { showPage('cards'); };
+    </script>
+</body>
+</html>
