@@ -1,0 +1,42 @@
+name: Build XiaoMi APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Prepare Project
+        run: |
+          cordova create app com.xiaomi.app XiaoMi
+          cd app
+          cordova platform add android@12.0.0
+          cp ../XiaoMi-Web.html www/index.html
+          if [ -f ../config.xml ]; then cp ../config.xml config.xml; fi
+          if [ -f ../icon.png ]; then mkdir -p res && cp ../icon.png res/icon.png; fi
+
+      - name: Build APK
+        run: |
+          cd app
+          cordova build android --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: XiaoMi-APK
+          path: app/platforms/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: warn
